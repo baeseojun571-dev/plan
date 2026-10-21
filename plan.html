@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>후쿠오카 여행 가이드 & 가고 싶은 곳 탐색기</title>
+  <style>
+    :root {
+      --primary-color: #e63946;
+      --secondary-color: #457b9d;
+      --bg-color: #f8f9fa;
+      --card-bg: #ffffff;
+      --text-color: #2b2d42;
+      --sub-text: #6c757d;
+      --border-color: #e9ecef;
+      --active-btn: #1d3557;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      line-height: 1.6;
+      padding-bottom: 40px;
+    }
+
+    header {
+      background: linear-gradient(135deg, #e63946, #b81d24);
+      color: white;
+      text-align: center;
+      padding: 2.5rem 1rem 2rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    header p {
+      font-size: 1rem;
+      opacity: 0.9;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+
+    /* 대분류 탭 */
+    .main-category-nav {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 1.5rem 0 1rem;
+      flex-wrap: wrap;
+    }
+
+    .main-btn {
+      padding: 12px 24px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border: 2px solid var(--primary-color);
+      background-color: white;
+      color: var(--primary-color);
+      border-radius: 30px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    .main-btn:hover, .main-btn.active {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    /* 중분류 탭 */
+    .sub-category-nav {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      background-color: white;
+      padding: 12px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .sub-btn {
+      padding: 8px 16px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      border: 1px solid var(--border-color);
+      background-color: #f1f3f5;
+      color: var(--text-color);
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .sub-btn:hover, .sub-btn.active {
+      background-color: var(--active-btn);
+      color: white;
+      border-color: var(--active-btn);
+    }
+
+    /* 검색창 & 상태 바 */
+    .search-box {
+      margin-bottom: 1.5rem;
+      display: flex;
+      gap: 10px;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 12px 18px;
+      border: 1px solid #ced4da;
+      border-radius: 8px;
+      font-size: 1rem;
+      outline: none;
+    }
+
+    .search-box input:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(230, 57, 70, 0.15);
+    }
+
+    .status-bar {
+      margin-bottom: 1rem;
+      font-size: 0.95rem;
+      color: var(--sub-text);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* 카드 리스트 */
+    .place-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .place-card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 1.25rem;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .place-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 15px rgba(0,0,0,0.08);
+    }
+
+    .card-header {
+      margin-bottom: 0.75rem;
+    }
+
+    .card-tags {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      background-color: #e9ecef;
+      color: #495057;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    .tag.main-tag {
+      background-color: #ffe3e3;
+      color: #c92a2a;
+    }
+
+    .card-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #111;
+      margin-bottom: 0.2rem;
+    }
+
+    .card-location {
+      font-size: 0.85rem;
+      color: var(--secondary-color);
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .card-desc {
+      font-size: 0.92rem;
+      color: #495057;
+      line-height: 1.5;
+    }
+
+    .no-results {
+      text-align: center;
+      grid-column: 1 / -1;
+      padding: 3rem;
+      color: var(--sub-text);
+      background: white;
+      border-radius: 12px;
+    }
+
+    /* 새로 추가된 하단 푸터 스타일 */
+    footer {
+      margin-top: 3rem;
+      padding: 2rem 1rem;
+      background-color: #1d3557;
+      color: white;
+      text-align: center;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    footer h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+      color: #f1faee;
+    }
+
+    footer p {
+      font-size: 0.9rem;
+      color: #a8dadc;
+    }
+
+    @media (max-width: 600px) {
+      header h1 { font-size: 1.5rem; }
+      .main-btn { padding: 8px 16px; font-size: 0.95rem; }
+      .sub-btn { padding: 6px 12px; font-size: 0.85rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🇯🇵 후쿠오카 여행 종합 가이드</h1>
+    <p>먹거리, 체험, 쇼핑, 기타까지 쉽고 빠르게 찾아보세요!</p>
+  </header>
+
+  <div class="container">
+    <!-- 대분류 버튼 -->
+    <div class="main-category-nav" id="mainCategoryNav">
+      <button class="main-btn active" onclick="setMainCategory('전체')">전체보기</button>
+      <button class="main-btn" onclick="setMainCategory('먹거리')">🍜 먹거리</button>
+      <button class="main-btn" onclick="setMainCategory('체험')">🎈 체험</button>
+      <button class="main-btn" onclick="setMainCategory('쇼핑')">🛍️ 쇼핑</button>
+      <button class="main-btn" onclick="setMainCategory('기타')">🎲 기타</button>
+    </div>
+
+    <!-- 중분류 버튼 -->
+    <div class="sub-category-nav" id="subCategoryNav">
+      <!-- JavaScript로 동적 생성됨 -->
+    </div>
+
+    <!-- 검색창 -->
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="장소 이름, 위치, 특징을 검색해 보세요 (예: 하카타, 텐진, 명란, 라멘...)" oninput="filterData()">
+    </div>
+
+    <!-- 검색 결과 상태 표시 -->
+    <div class="status-bar">
+      <span id="resultCount">검색 결과: 0개</span>
+      <span id="currentCategoryText">카테고리: 전체</span>
+    </div>
+
+    <!-- 데이터 그리드 -->
+    <div class="place-grid" id="placeGrid">
+      <!-- JavaScript로 동적 카드 생성됨 -->
+    </div>
+
+    <!-- 새로 추가된 서주니 여행 계획 추천 도우미 (영문) -->
+    <footer>
+      <h2>✈️ Seojun's Travel Planning Assistant</h2>
+      <p>Your ultimate companion for crafting the perfect trip to Fukuoka!</p>
+    </footer>
+  </div>
+
+  <script>
+    // 후쿠오카 전체 데이터 정의
+    const travelData = [
+      // ================= 먹거리 - 식사 =================
+      {
+        main: "먹거리",
+        sub: "식사",
+        detailCategory: "라멘",
+        name: "하카타 잇소우 본점 (Hakata Issou)",
+        location: "하카타역 동쪽 출구에서 도보 약 6분",
+        desc: "표면에 고소한 거품이 올라와 '돈코츠 카푸치노'라는 별명이 붙은 대표 맛집입니다. 깊고 진한 돼지사골 국물 맛을 원하시는 분들에게 만족도가 극상입니다."
+      },
+      {
+        main: "먹거리",
+        sub: "식사",
+        detailCategory: "라멘",
+        name: "신신라멘 텐진 본점 / 하카타 데이토스점 (ShinShin)",
+        location: "텐진역 도보 5분 (본점) / 하카타역 건물 내 데이토스 2층",
+        desc: "돼지누린내가 거의 없어 돈코츠 라멘 초보자도 호불호 없이 깔끔하게 즐길 수 있는 최고의 대중적 인지도 식당입니다."
+      },
+      {
+        main: "먹거리",
+        sub: "식사",
+        detailCategory: "라멘",
+        name: "멘야 카네토라 (Menya Kanetora)",
+        location: "텐진 다이묘 거리 도보 5분 / 하카타역 데이토스 내",
+        desc: "츠케멘(진한 농축 육수에 면을 적셔 먹는 라멘) 분야에서 압도적인 평점을 받는 곳으로, 걸쭉하고 고소한 멸치/돼지 육수가 일품입니다."
+      },
+      {
+        main: "먹거리",
+        sub: "식사",
+        detailCategory: "모츠나베 & 전골",
+        name: "모츠나베 오오야마 KITTE 하카타점 (Oyama)",
+        location: "하카타역 직통 연결 (KITTE 빌딩 9층)",
+        desc: "된장(미소) 베이스의 진한 모츠나베 맛집으로, 역사 건물 내에 있어 접근성이 최고 수준입니다. 깔끔한 분위기와 1인석 마련으로 혼밥족 및 가족 단위 만족도가 매우 높습니다."
+      },
+      {
+        main: "먹거리",
+        sub: "식사",
+        detailCategory: "모츠나베 & 전골",
+        name: "마에다야 총본점 / 다이묘점 (Maedaya)",
+        location: "하카타역 도보 3분 (총본점) / 텐진 다이묘 도보 5분 (다이묘점)",
+        desc: "소유(간장) 및 미소 국물 모두 우수하며, 사이드로 판매하는 '소고기 우설 구이'와 '고등어회(고마사바)'의 품질 평가가 매우 높은 고급스러운 맛집입니다."
+      },
+      {
+        main: "먹거리",
+        sub: "식사",
+        detailCategory: "명란 & 정식",
+        name: "원조 하카타 멘타이쥬 (Hakata Mentaiju)",
+        location: "텐진역 / 나카스카와바타역 도보 5분 (텐진 중앙공원 앞)",
+        desc: "후쿠오카 특산물인 고급 수제 명란을 얹은 덮밥(멘타이쥬) 전문점입니다. 정갈한 포장과 인테리어, 정성스러운 맛으로 후쿠오카 방문 시 필수 코스로 꼽힙니다."
+      },
+      {
+        main: "먹거리",
+        sub: "식사",
+        detailCategory: "명란 & 정식",
+        name: "키스이마루 (Kisaimaru)",
+        location: "텐진 솔라리아 스테이지 지하 2층 / 하카타역 지하 1층",
+        desc: "신선한 사시미/해산물 정식을 판매하는데, 무엇보다 '명란젓 무제한 제공' 서비스가 있어 여행객들의 만족도가 매우 뛰어납니다."
+      },
+      {
+        main: "먹거리",
+        sub: "식사",
+        detailCategory: "고기 요리 / 야키니쿠",
+        name: "키와미야 함바그 텐진점 / 하카타점 (Kiwamiya)",
+        location: "텐진 파르코 백화점 지하 1층 / 하카타역 버스터미널 1층",
+        desc: "달궈진 돌에 직접 구워 먹는 100% 규슈산 와규 함바그 스테이크 전문점입니다. 대기 시간은 길지만 맛에 대한 만족도가 워낙 높아 꾸준히 최상위 평점을 유지합니다."
+      },
+      {
+        main: "먹거리",
+        sub: "식사",
+        detailCategory: "고기 요리 / 야키니쿠",
+        name: "야키니쿠 바쿠로 하카타점 (Yakiniku Bakuro)",
+        location: "캐널시티 하카타 도보 3분 / 하카타역 도보 8분",
+        desc: "농장 직영 와규를 사용하여 고기 질이 대단히 뛰어납니다. 특히 점심 특선 메뉴의 가성비가 훌륭해 만족도가 높습니다."
+      },
+      {
+        main: "먹거리",
+        sub: "식사",
+        detailCategory: "스시 & 해산물",
+        name: "스시사카바 사시스 (Sashisu)",
+        location: "하카타역 지하상가 (하카타 킷테/마잉구 인근)",
+        desc: "캐주얼한 초밥 술집 형태의 식당으로, 참치 참다랑어가 듬뿍 들어간 '참치 김말이(에도마에 마키)'와 가성비 좋은 생선초밥으로 인기를 끌고 있습니다."
+      },
+      {
+        main: "먹거리",
+        sub: "식사",
+        detailCategory: "스시 & 해산물",
+        name: "효탄스시 본점 (Hyotan Sushi)",
+        location: "텐진역 바로 앞 (솔라리아 스테이지 도보 1분)",
+        desc: "텐진 한복판에 위치하여 이동이 편리하며, 신선하고 두툼한 횟감이 얹어진 고급 회전초밥/스시 정식을 합리적인 가격에 즐길 수 있습니다."
+      },
+      {
+        main: "먹거리",
+        sub: "식사",
+        detailCategory: "우동 & 튀김",
+        name: "텐푸라 히라오 본점 / 다이묘점 (Tempura Hirao)",
+        location: "텐진 다이묘 거리 도보 5분 (다이묘점)",
+        desc: "바삭한 튀김을 갓 튀겨 하나씩 손님의 접시에 올려주는 정식집입니다. 밑반찬으로 나오는 '수제 오징어 젓갈'이 무제한 제공되어 대만족을 이끌어내는 필수 맛집입니다."
+      },
+      {
+        main: "먹거리",
+        sub: "식사",
+        detailCategory: "우동 & 튀김",
+        name: "타이라 우동 / 스케상 우동 (Udon)",
+        location: "하카타역 도보 8분 (타이라) / 하카타역 지하 및 텐진 중심가 (스케상)",
+        desc: "후쿠오카 특유의 부드럽고 매끄러운 우동 면발 위에 바삭한 우엉 튀김(고보텐)을 올려 먹는 향토 우동 맛집들입니다."
+      },
+
+      // ================= 먹거리 - 간식 =================
+      {
+        main: "먹거리",
+        sub: "간식",
+        detailCategory: "베이커리 & 생도넛",
+        name: "아임도넛 후쿠오카 (I'm donut? Fukuoka)",
+        location: "텐진역 6번 출구 바로 앞 (도보 1분)",
+        desc: "입에 넣자마자 스르륵 녹는 독보적인 식감의 ‘생도넛’ 전문점입니다. 텐진 한복판에 있어 접근성이 최고이며, 웨이팅을 감수하더라도 꼭 먹어봐야 할 간식으로 평가받습니다."
+      },
+      {
+        main: "먹거리",
+        sub: "간식",
+        detailCategory: "베이커리 & 생도넛",
+        name: "일포르노델미뇽 (Il Forno del Mignon)",
+        location: "하카타역 중앙 개찰구 바로 앞 (하카타역 내부)",
+        desc: "줄 서서 사 먹는 미니 크루아상 집입니다. 플레인, 초코, 고구마 맛이 있으며, 갓 구워낸 바삭함과 고소한 버터 향으로 하카타역을 지날 때 지나칠 수 없는 필수 간식입니다."
+      },
+      {
+        main: "먹거리",
+        sub: "간식",
+        detailCategory: "베이커리 & 생도넛",
+        name: "풀풀 하카타 (Full Full Hakata)",
+        location: "캐널시티 하카타 및 쿠시다신사 도보 3분",
+        desc: "후쿠오카 특산물인 명란을 듬뿍 넣은 '명란 바게트'로 가장 유명한 베이커리 중 하나입니다. 바삭한 바게트와 짭조름한 명란 크림의 조합이 훌륭합니다."
+      },
+      {
+        main: "먹거리",
+        sub: "간식",
+        detailCategory: "파르페 & 수플레 팬케이크",
+        name: "다이묘 소프트 크림 / 캔디드 (Daimyo Soft Cream / Candied)",
+        location: "텐진 다이묘 거리 도보 3~5분",
+        desc: "규슈산 최고급 딸기('아마오우')를 아낌없이 올린 제철 과일 파르페와 쫀득하고 진한 프리미엄 소프트아이스크림으로 비주얼과 맛 모두에서 높은 평가를 받습니다."
+      },
+      {
+        main: "먹거리",
+        sub: "간식",
+        detailCategory: "파르페 & 수플레 팬케이크",
+        name: "시아와세노 팬케이크 텐진점 (A Happy Pancake)",
+        location: "텐진역 도보 4분",
+        desc: "폭신폭신하고 부드러운 수플레 팬케이크 전문점으로, 입안에서 부드럽게 사라지는 식감과 마스카포네 버터의 풍미로 여성 여행객 및 연인들에게 만족도가 높습니다."
+      },
+      {
+        main: "먹거리",
+        sub: "간식",
+        detailCategory: "전통 간식 & 떡",
+        name: "kashiya KANON (다자이후 우메가에모찌 매장들)",
+        location: "다자이후 본점 외에도 텐진 지하상가 및 하카타역 팝업/식품관",
+        desc: "겉은 바삭하고 속은 쫀득한 찹쌀 피 안에 달콤한 팥소가 들어간 구운 떡입니다. 뜨거울 때 바로 먹으면 담백하고 고소하여 호불호가 없는 맛입니다."
+      },
+      {
+        main: "먹거리",
+        sub: "간식",
+        detailCategory: "전통 간식 & 떡",
+        name: "하카타 스즈카케 본점 (Suzukake)",
+        location: "나카스카와바타역 5번 출구 바로 앞",
+        desc: "90년 전통의 고급 화과자점으로, 귀여운 종 모양의 미니 모찌('수즈라 모찌')와 신선한 딸기가 들어간 딸기 찹쌀떡(딸기 다이후쿠)이 시그니처입니다. 고급스러운 선물용으로도 인기입니다."
+      },
+      {
+        main: "먹거리",
+        sub: "간식",
+        detailCategory: "힐링 카페 & 음료",
+        name: "FUK COFFEE (푹 커피)",
+        location: "하카타역 도보 8분 / 기온역 도보 3분",
+        desc: "공항과 여행을 테마로 한 감성 카페로, 맛있는 에스프레소 음료와 함께 진한 '수제 푸딩(아이스크림 추가 필수)'이 대단한 인기를 끌고 있습니다."
+      },
+      {
+        main: "먹거리",
+        sub: "간식",
+        detailCategory: "힐링 카페 & 음료",
+        name: "NO COFFEE (노 커피)",
+        location: "텐진 인근 야쿠인 에리어 (텐진에서 도보 12분 또는 버스 5분)",
+        desc: "블랙 앤 화이트의 깔끔한 인테리어와 시그니처 '블랙 라떼(말차+에스프레소+모카)'로 유명하며, 힙한 브랜드 굿즈와 감성적인 분위기로 만족도가 높습니다."
+      },
+      {
+        main: "먹거리",
+        sub: "간식",
+        detailCategory: "편의점 베스트 간식",
+        name: "로손 (Lawson): 모찌식감 롤",
+        location: "후쿠오카 시내 전체 로손 편의점",
+        desc: "쫀득한 빵 속에 부드러운 크림이 가득 차 있어 편의점 디저트 만족도 1위인 필수 간식입니다."
+      },
+      {
+        main: "먹거리",
+        sub: "간식",
+        detailCategory: "편의점 베스트 간식",
+        name: "세븐일레븐 (7-Eleven): 세븐카페 스무디",
+        location: "후쿠오카 시내 주요 세븐일레븐 매장",
+        desc: "카운터에서 얼음 과일 컵을 구매해 매장 내 즉석 스무디 머신으로 갈아 마시는 건강하고 신선한 음료입니다."
+      },
+      {
+        main: "먹거리",
+        sub: "간식",
+        detailCategory: "편의점 베스트 간식",
+        name: "패밀리마트 (FamilyMart): 파미치키 & 수플레 푸딩",
+        location: "후쿠오카 시내 전체 패밀리마트 편의점",
+        desc: "바삭하고 육즙이 넘치는 치킨(파미치키)과 푹신한 수플레 케이크가 올라간 푸딩 조합입니다."
+      },
+
+      // ================= 체험 =================
+      {
+        main: "체험",
+        sub: "전시",
+        detailCategory: "전시",
+        name: "팀랩 포레스트 후쿠오카 (teamLab Forest Fukuoka)",
+        location: "모모치 해변 인근 (BOSS E-ZO FUKUOKA 5층 / 하카타·텐진에서 버스 15~20분)",
+        desc: "세계적인 미디어 아트 그룹 팀랩의 빛과 영상 전시입니다. 스마트폰 앱으로 디지털 동물을 수집하는 '포획의 숲'과 오감을 자극하는 '운동의 숲'으로 구성되어 몰입감과 만족도가 최고 수준입니다."
+      },
+      {
+        main: "체험",
+        sub: "전시",
+        detailCategory: "전시",
+        name: "후쿠오카 시립 미술관 (Fukuoka Art Museum)",
+        location: "오호리 공원 내 (지하철 오호리공원역 도보 8분)",
+        desc: "쿠사마 야요이의 대표작인 '노란 호박' 야외 조형물과 함께 고미술부터 현대미술까지 다양하게 감상할 수 있습니다. 오호리 공원 산책과 묶어서 가기 아주 좋습니다."
+      },
+      {
+        main: "체험",
+        sub: "전통",
+        detailCategory: "전통",
+        name: "다자이후 텐만구 (Dazaifu Tenmangu)",
+        location: "텐진역에서 니시테츠 전철로 약 30분",
+        desc: "학문의 신을 모시는 천년 역사의 신사입니다. 운치 있는 신사 경내와 고풍스러운 상점가, 정갈한 정원 산책 등 일본 전통 분위기를 가장 완벽하게 느낄 수 있어 필수 코스로 꼽힙니다."
+      },
+      {
+        main: "체험",
+        sub: "전통",
+        detailCategory: "전통",
+        name: "토초지 (Tochoji Temple)",
+        location: "기온역 1번 출구 바로 앞 (하카타역 도보 10분)",
+        desc: "일본에서 가장 큰 목조 대불상(하카타 대불)이 있는 역사 깊은 절입니다. 도심 한복판에 있어 접근성이 극상이며, 대불상 밑 '지옥·극락 체험 통로'라는 독특한 전통 체험도 가능합니다."
+      },
+      {
+        main: "체험",
+        sub: "전통",
+        detailCategory: "전통",
+        name: "쿠시다 신사 (Kushida Shrine)",
+        location: "기온역 도보 3분 / 캐널시티 하카타 도보 2분",
+        desc: "하카타의 수호신을 모시는 신사로, 후쿠오카의 대표 축제인 '하카타 기온 야마카사'에 쓰이는 거대한 가마가 상시 전시되어 있어 현지 전통문화를 가까이서 체감할 수 있습니다."
+      },
+      {
+        main: "체험",
+        sub: "관광",
+        detailCategory: "관광",
+        name: "후쿠오카 타워 & 모모치 해변 (Fukuoka Tower & Momochi Seaside)",
+        location: "하카타·텐진에서 버스로 약 20분",
+        desc: "높이 234m의 랜드마크 타워 전망대에서 후쿠오카 시내와 바다 전경을 한눈에 담을 수 있습니다. 바로 앞 이국적인 인공 해변인 모모치 비치와 묶어서 방문하는 시내 최고의 관광 명소입니다."
+      },
+      {
+        main: "체험",
+        sub: "관광",
+        detailCategory: "관광",
+        name: "오호리 공원 & 일본정원 (Ohori Park)",
+        location: "지하철 오호리공원역 도보 3분 (텐진에서 지하철 2정거장)",
+        desc: "거대한 호수를 중심으로 조성된 도심 속 힐링 명소입니다. 호수 위를 떠다니는 오리배/보트 체험과 정갈하게 가꿔진 전통 '일본정원' 관람이 가능해 만족도가 대단히 높습니다."
+      },
+      {
+        main: "체험",
+        sub: "관광",
+        detailCategory: "관광",
+        name: "라라포트 후쿠오카 건담 파크 (LaLaport Fukuoka)",
+        location: "하카타역에서 버스로 약 15분 / 철도 타케시타역 도보 9분",
+        desc: "건물 앞에 서 있는 24.8m의 실물 크기 'RX-93ff ν건담' 조형물이 압권입니다. 정해진 시간마다 움직이는 라이팅 쇼와 내부 건담 파크 전시관 등 볼거리가 풍부합니다."
+      },
+      {
+        main: "체험",
+        sub: "이색체험",
+        detailCategory: "이색체험",
+        name: "나카스 리버 크루즈 (Nakasu River Cruise)",
+        location: "텐진 중앙공원 선착장 (텐진역 도보 5분 / 나카스 도보 3분)",
+        desc: "약 30분간 나카스 강을 따라 운항하는 유람선 체험입니다. 선상에서 펼쳐지는 가수의 라이브 공연을 들으며 도심의 화려한 야경과 포장마차 거리를 감상하는 이색적인 낭만이 있습니다."
+      },
+      {
+        main: "체험",
+        sub: "이색체험",
+        detailCategory: "이색체험",
+        name: "BOSS E-ZO FUKUOKA 어트랙션",
+        location: "후쿠오카 페이페이돔 바로 옆 (하카타·텐진 버스 15~20분)",
+        desc: "건물 옥상에서 출발하는 튜브형 슬라이드, 짚라인, 가상현실(VR) 액티비티 등 도심형 익스트림 어트랙션을 한곳에서 즐길 수 있는 이색 복합 엔터테인먼트 공간입니다."
+      },
+      {
+        main: "체험",
+        sub: "이색체험",
+        detailCategory: "이색체험",
+        name: "아지쿠라 / 후쿠야 멘타이코 수제 만들기 (Mentaiko DIY)",
+        location: "기온역 인근 / 하카타역 인근 매장들",
+        desc: "후쿠오카 대표 특산물인 명란젓(멘타이코)을 자신이 원하는 매운맛과 양념 비율로 직접 담가보는 이색 요리 체험입니다. 완성된 명란은 보관용 상자에 담아 기념품으로 가져갈 수 있습니다."
+      },
+
+      // ================= 쇼핑 =================
+      {
+        main: "쇼핑",
+        sub: "쇼핑몰",
+        detailCategory: "백화점 & 대형 쇼핑몰",
+        name: "JR 하카타 시티 (아뮤플라자 & 한큐 백화점)",
+        location: "하카타역 직통 연결",
+        desc: "하카타역과 바로 붙어 있어 이동이 가장 편리합니다. 한큐 백화점에서는 5% 할인 쿠폰과 면세 혜택을 받아 명품 및 잡화를 구매하기 좋고, 아뮤플라자에는 패션·인테리어 브랜드가 가득합니다."
+      },
+      {
+        main: "쇼핑",
+        sub: "쇼핑몰",
+        detailCategory: "백화점 & 대형 쇼핑몰",
+        name: "이와타야 백화점 (Iwataya Department Store)",
+        location: "텐진역 도보 3분",
+        desc: "꼼데가르송, 셀린느, 디올, 바오바오 등 인기 디자이너 및 명품 브랜드가 집결된 후쿠오카 대표 백화점입니다. 외국인 게스트 카드로 5% 추가 할인을 받을 수 있어 만족도가 극상입니다."
+      },
+      {
+        main: "쇼핑",
+        sub: "쇼핑몰",
+        detailCategory: "백화점 & 대형 쇼핑몰",
+        name: "캐널시티 하카타 (Canal City Hakata)",
+        location: "기온역 도보 7분 / 하카타역 도보 10분",
+        desc: "운하가 흐르는 대형 복합 쇼핑몰로 프랑프랑, 무인양품, 알펜(스포츠용품) 등 대형 매장들이 입점해 있습니다. 분수 쇼 관람과 쇼핑을 한곳에서 해결할 수 있습니다."
+      },
+      {
+        main: "쇼핑",
+        sub: "패션",
+        detailCategory: "스트릿 패션 & 빈티지",
+        name: "텐진 다이묘 거리 (Daimyo Street)",
+        location: "텐진역 도보 5분 / 아카사카역 도보 4분",
+        desc: "후쿠오카의 '하늘 아래 가장 힙한 골목'입니다. 슈프림, 베이프, 스투시, 휴먼메이드 등 인기 스트릿 브랜드 매장들이 도보 5분 거리에 밀집해 있습니다."
+      },
+      {
+        main: "쇼핑",
+        sub: "패션",
+        detailCategory: "스트릿 패션 & 빈티지",
+        name: "2nd STREET (세컨드 스트리트 텐진/다이묘점)",
+        location: "텐진 다이묘 거리 내",
+        desc: "일본 최대 규모의 빈티지/중고 세렉트 샵입니다. 명품부터 스트릿 의류까지 상태가 뛰어난 중고 패션 아이템을 합리적인 가격에 보물찾기하듯 쇼핑할 수 있습니다."
+      },
+      {
+        main: "쇼핑",
+        sub: "오타쿠",
+        detailCategory: "캐릭터 & 덕질 / 팝컬처",
+        name: "하카타 포켓몬센터 (Pokemon Center Fukuoka)",
+        location: "하카타역 아뮤플라자 8층",
+        desc: "후쿠오카 한정 포켓몬 굿즈와 인형, 봉제인형 등을 판매하는 오피셜 샵입니다. 역 내에 있어 아이 동반 가족이나 포켓몬 팬들에게 만족도가 매우 높습니다."
+      },
+      {
+        main: "쇼핑",
+        sub: "오타쿠",
+        detailCategory: "캐릭터 & 덕질 / 팝컬처",
+        name: "라라포트 건담베이스 (Gundam Base Fukuoka)",
+        location: "라라포트 후쿠오카 4층 (하카타역 버스 15분)",
+        desc: "야외 실물 크기 건담과 함께 내부 대형 건담베이스 매장에서 한정판 건프라 프라모델과 굿즈를 구매할 수 있는 덕질 필수 코스입니다."
+      },
+      {
+        main: "쇼핑",
+        sub: "오타쿠",
+        detailCategory: "캐릭터 & 덕질 / 팝컬처",
+        name: "텐진 파르코 캐릭터 존 (PARCO - 애니메이트 & 짱구/지브리 샵)",
+        location: "텐진역 직통 연결 (파르코 7~8층)",
+        desc: "애니메이트, 짱구는 못말려 오피셜 샵, 원피스 샵 등이 한 층에 모여 있어 텐진 한복판에서 캐릭터 쇼핑을 완성할 수 있습니다."
+      },
+      {
+        main: "쇼핑",
+        sub: "드럭스토어",
+        detailCategory: "드럭스토어 & 생활 잡화",
+        name: "돈키호테 텐진본점 / 나카스점 (Don Quijote)",
+        location: "텐진역 도보 3분 (텐진본점) / 나카스카와바타역 직통 (나카스점)",
+        desc: "24시간 운영되는 대형 심야 쇼핑 스폿입니다. 의약품, 화장품, 간식, 캐릭터 굿즈, 주류까지 면세로 대량 구매하기 최적화되어 있습니다."
+      },
+      {
+        main: "쇼핑",
+        sub: "드럭스토어",
+        detailCategory: "드럭스토어 & 생활 잡화",
+        name: "텐진 로프트 (Loft)",
+        location: "텐진 솔라리아 스테이지 / 텐진역 도보 2분",
+        desc: "감각적인 문구류, 화장품, 생활 잡화, 아이디어 상품이 가득한 대형 잡화점입니다. 구경하는 재미와 소소한 선물거리를 사기에 최고입니다."
+      },
+      {
+        main: "쇼핑",
+        sub: "드럭스토어",
+        detailCategory: "드럭스토어 & 생활 잡화",
+        name: "텐진 지하상가 (Tenjin Underground Shopping Mall)",
+        location: "텐진역 지하 전체 연결",
+        desc: "유럽풍의 고풍스러운 분위기의 지하상가로, 의류, 신발, 액세서리, 드럭스토어가 길게 이어져 있어 날씨 상관없이 쾌적하게 쇼핑할 수 있습니다."
+      },
+      {
+        main: "쇼핑",
+        sub: "기념품",
+        detailCategory: "식품 & 기념품 / 오미야게",
+        name: "하카타역 마잉구 (Ming - Hakata Station)",
+        location: "하카타역 1층 내부",
+        desc: "후쿠오카 최고의 오미야게(선물용 과자) 전문 구역입니다. 명란 과자 '멘베이', 하카타 도라에몽, 병 명란젓, 유명 베이커리 등 선물용 먹거리가 모두 집결되어 있습니다."
+      },
+      {
+        main: "쇼핑",
+        sub: "기념품",
+        detailCategory: "식품 & 기념품 / 오미야게",
+        name: "빅카메라 텐진 2호점 주류 코너 (Bic Camera Liquor)",
+        location: "텐진역 도보 4분",
+        desc: "닷사이, 쿠보타 등 유명 일본 사케부터 산토리 위스키, 카발란 등 양주류를 면세 혜택과 추가 할인 쿠폰을 적용받아 저렴하게 구매할 수 있는 필수 주류 쇼핑 스폿입니다."
+      },
+
+      // ================= 기타 =================
+      {
+        main: "기타",
+        sub: "포켓몬숍&뽑기",
+        detailCategory: "캐릭터 스토어 & 가챠",
+        name: "가챠폰의 성지 - 텐진 파르코 & 캐널시티 캡슐토이 매장",
+        location: "텐진 파르코 7층 / 캐널시티 하카타 2층",
+        desc: "수백 가지 종류의 캡슐토이(가챠) 기계가 빼곡히 들어서 있는 피규어 및 뽑기 천국입니다. 소소한 재미와 귀여운 기념품을 뽑기에 제격입니다."
+      },
+      {
+        main: "기타",
+        sub: "포켓몬숍&뽑기",
+        detailCategory: "엔터테인먼트",
+        name: "남코 (namco) 하카타 버스터미널점 / 텐진점",
+        location: "하카타 버스터미널 7층 / 텐진 중심가",
+        desc: "대형 인형뽑기, 아케이드 리듬 게임, 스티커사진(프리카) 기계가 가득한 대표 종합 오락 공간입니다."
+      },
+      {
+        main: "기타",
+        sub: "편의시설&팁",
+        detailCategory: "여행 꿀팁",
+        name: "나카스 야타이 거리 (포장마차)",
+        location: "나카스 강변 따라 형성 (나카스카와바타역 도보 5분)",
+        desc: "후쿠오카 밤하늘과 분위기를 즐기며 간단히 꼬치구이와 라멘, 사케를 맛볼 수 있는 낭만적인 야외 포장마차 거립니다."
+      }
+    ];
+
+    // 중분류 카테고리 구조 정의
+    const subCategoriesMap = {
+      "먹거리": ["전체", "식사", "간식"],
+      "체험": ["전체", "전시", "전통", "관광", "이색체험"],
+      "쇼핑": ["전체", "쇼핑몰", "패션", "오타쿠", "드럭스토어", "기념품"],
+      "기타": ["전체", "포켓몬숍&뽑기", "편의시설&팁"]
+    };
+
+    // 현재 선택된 상태
+    let currentMainCategory = "전체";
+    let currentSubCategory = "전체";
+
+    // 초기화 함수
+    function init() {
+      updateSubCategoryNav();
+      filterData();
+    }
+
+    // 대분류 변경
+    function setMainCategory(mainCat) {
+      currentMainCategory = mainCat;
+      currentSubCategory = "전체"; // 중분류 초기화
+
+      // 버튼 활성화 스타일 변경
+      const mainBtns = document.querySelectorAll('.main-btn');
+      mainBtns.forEach(btn => {
+        if(btn.innerText.includes(mainCat) || (mainCat === '전체' && btn.innerText === '전체보기')) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+
+      updateSubCategoryNav();
+      filterData();
+    }
+
+    // 중분류 버튼 동적 업데이트
+    function updateSubCategoryNav() {
+      const subNav = document.getElementById('subCategoryNav');
+      subNav.innerHTML = '';
+
+      if (currentMainCategory === "전체") {
+        subNav.style.display = 'none';
+        return;
+      }
+
+      subNav.style.display = 'flex';
+      const subList = subCategoriesMap[currentMainCategory] || [];
+
+      subList.forEach(subCat => {
+        const btn = document.createElement('button');
+        btn.className = `sub-btn ${subCat === currentSubCategory ? 'active' : ''}`;
+        btn.innerText = subCat === "전체" ? `${currentMainCategory} 전체` : subCat;
+        btn.onclick = () => setSubCategory(subCat);
+        subNav.appendChild(btn);
+      });
+    }
+
+    // 중분류 변경
+    function setSubCategory(subCat) {
+      currentSubCategory = subCat;
+
+      const subBtns = document.querySelectorAll('.sub-btn');
+      subBtns.forEach(btn => {
+        if((subCat === '전체' && btn.innerText.includes('전체')) || btn.innerText === subCat) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+
+      filterData();
+    }
+
+    // 데이터 필터링 및 화면 출력
+    function filterData() {
+      const searchKeyword = document.getElementById('searchInput').value.toLowerCase().trim();
+      const placeGrid = document.getElementById('placeGrid');
+      placeGrid.innerHTML = '';
+
+      let filtered = travelData.filter(item => {
+        // 대분류 조건
+        const mainMatch = (currentMainCategory === "전체") || (item.main === currentMainCategory);
+        // 중분류 조건
+        const subMatch = (currentSubCategory === "전체") || (item.sub === currentSubCategory);
+        // 검색어 조건
+        const searchMatch = !searchKeyword || 
+          item.name.toLowerCase().includes(searchKeyword) ||
+          item.location.toLowerCase().includes(searchKeyword) ||
+          item.desc.toLowerCase().includes(searchKeyword) ||
+          item.detailCategory.toLowerCase().includes(searchKeyword);
+
+        return mainMatch && subMatch && searchMatch;
+      });
+
+      // 개수 및 상태 업데이트
+      document.getElementById('resultCount').innerText = `검색 결과: ${filtered.length}개`;
+      
+      let catText = `카테고리: ${currentMainCategory}`;
+      if (currentMainCategory !== "전체" && currentSubCategory !== "전체") {
+        catText += ` > ${currentSubCategory}`;
+      }
+      document.getElementById('currentCategoryText').innerText = catText;
+
+      // 결과 카드가 없을 때
+      if (filtered.length === 0) {
+        placeGrid.innerHTML = `
+          <div class="no-results">
+            <h3>🔍 조건에 일치하는 결과가 없습니다.</h3>
+            <p>다른 검색어나 카테고리를 선택해 보세요.</p>
+          </div>
+        `;
+        return;
+      }
+
+      // 카드 생성
+      filtered.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'place-card';
+        card.innerHTML = `
+          <div>
+            <div class="card-tags">
+              <span class="tag main-tag">${item.main}</span>
+              <span class="tag">${item.sub}</span>
+              <span class="tag">${item.detailCategory}</span>
+            </div>
+            <h3 class="card-title">${item.name}</h3>
+            <div class="card-location">📍 ${item.location}</div>
+            <p class="card-desc">${item.desc}</p>
+          </div>
+        `;
+        placeGrid.appendChild(card);
+      });
+    }
+
+    // 페이지 로드 시 시작
+    window.onload = init;
+  </script>
+</body>
+</html>
